@@ -4,10 +4,10 @@
   "private": true,
   "dependencies": {
     "@types/node": "^16.18.119",
-    "@types/react": "15.7.0",
-    "@types/react-dom": "~15",
-    "react": "15.7.0",
-    "react-dom": "15.7.0",
+    "@types/react": "^16.14.0",
+    "@types/react-dom": "^16.9.24",
+    "react": "^16.14.0",
+    "react-dom": "16.14",
     "react-scripts": "^4.0.3",
     "typescript": "3.9.10",
     "web-vitals": "^2.1.4"
@@ -35,5 +35,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   }
 }
