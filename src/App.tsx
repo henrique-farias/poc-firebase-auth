@@ -1,18 +1,18 @@
 import * as React from 'react'
 import './App.css'
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  signInWithRedirect,
-} from 'firebase/auth'
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { initializeApp } from 'firebase/app'
 import 'dotenv/config'
 
 function App() {
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
+  const [env, setEnv] = React.useState('')
+  const isMobile = (): boolean => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  }
+  const isWebView = (): boolean => {
+    const userAgent = navigator.userAgent
+    return /(wv|WebView)/i.test(userAgent)
+  }
 
   const config = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -26,32 +26,19 @@ function App() {
   const auth = getAuth(firebaseApp)
   const googleSignIn = async (): Promise<void> => {
     try {
+      if (isMobile()) {
+        if (isWebView()) {
+          setEnv('webview')
+          return
+        }
+      }
       const provider = new GoogleAuthProvider()
-      const result = await signInWithRedirect(auth, provider)
+      const result = await signInWithPopup(auth, provider)
       console.log(result)
     } catch (e) {
       console.error(e)
     }
   }
-
-  const emailSignUp = async (): Promise<void> => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential)
-      })
-      .catch((e) => console.error(e))
-  }
-
-  const emailSignIn = async (): Promise<void> => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential)
-      })
-      .catch((e) => console.error(e))
-  }
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)
 
   return (
     <div
@@ -64,40 +51,14 @@ function App() {
         height: '100vh',
       }}
     >
-      POC Firebase Auth
-      <div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <h3>Sign in</h3>
-          <input
-            style={{
-              padding: '10px 20px',
-              margin: '10px',
-              borderRadius: '5px',
-              border: '1px solid gray',
-              backgroundColor: 'transparent',
-              color: 'black',
-            }}
-            type="text"
-            placeholder="email"
-            onChange={handleEmailChange}
-          />
-          <input
-            style={{
-              padding: '10px 20px',
-              margin: '10px',
-              borderRadius: '5px',
-              border: '1px solid gray',
-              backgroundColor: 'transparent',
-              color: 'black',
-            }}
-            type="text"
-            placeholder="senha"
-            onChange={handlePasswordChange}
-          />
-        </div>
-        <Button onClick={emailSignUp}>Sign Up with Email</Button>
-        <Button onClick={emailSignIn}>Sign In with Email</Button>
+      POC Firebase Auth {env}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Button onClick={googleSignIn}>Sign in with Google</Button>
+        {env === 'webview' && (
+          <a href="http://10.0.2.2:3000" target="_blank" rel="noopener noreferrer">
+            Ir para o navegador
+          </a>
+        )}
       </div>
     </div>
   )
